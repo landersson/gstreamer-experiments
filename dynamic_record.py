@@ -9,6 +9,61 @@ from gi.repository import Gst, GLib
 
 
 class DynamicPipeline:
+
+    class RecordingBranch:
+        def __init__(self, pipeline, tee, filename):
+            self.filename = filename
+            # Create recording elements
+            queue_record = Gst.ElementFactory.make("queue", "queue_record")
+            encoder = Gst.ElementFactory.make("x264enc", "encoder")
+            parser = Gst.ElementFactory.make("h264parse", "parser")
+            muxer = Gst.ElementFactory.make("mp4mux", "muxer")
+            filesink = Gst.ElementFactory.make("filesink", "filesink")
+
+            # Configure elements
+            encoder.set_property("tune", "zerolatency")
+            filesink.set_property("location", filename)
+
+            # Store elements for later cleanup
+            self.recording_elements = [queue_record, encoder, parser, muxer, filesink]
+
+            # Add elements to pipeline
+            for element in self.recording_elements:
+                pipeline.add(element)
+
+            # Link elements
+            queue_record.link(encoder)
+            encoder.link(parser)
+            parser.link(muxer)
+            muxer.link(filesink)
+
+            # Get tee src pad
+            tee_src_pad_template = tee.get_pad_template("src_%u")
+            self.recording_pad = tee.request_pad(tee_src_pad_template, None, None)
+            queue_sink_pad = queue_record.get_static_pad("sink")
+            self.recording_pad.link(queue_sink_pad)
+
+            # Set states
+            for element in self.recording_elements:
+                element.sync_state_with_parent()
+
+        def unlink_and_send_eos(self):
+            filesink = self.recording_elements[-1]  # Get reference to filesink
+
+            # Get the first element's sink pad and unlink first
+            queue_record = self.recording_elements[0]
+            queue_sink_pad = queue_record.get_static_pad("sink")
+            self.recording_pad.unlink(queue_sink_pad)
+
+            # Now send EOS - it can only go downstream
+            queue_sink_pad.send_event(Gst.Event.new_eos())
+
+            # Wait a bit for EOS to propagate
+            print("Waiting for EOS to propagate...")
+
+        def sink(self):
+            return self.recording_elements[-1]
+
     def __init__(self):
         Gst.init(None)
 
@@ -43,14 +98,14 @@ class DynamicPipeline:
         self.tee.link(self.queue_display)
         self.queue_display.link(self.display_sink)
 
-        # Initialize recording branch elements as None
-        self.recording_elements = []
-        self.recording_pad = None
-
         # Add message watch
         bus = self.pipeline.get_bus()
         bus.add_signal_watch()
         bus.connect("message", self.on_message, None)
+
+        self.next_tee_id = 0
+        self.tee_branches = {}
+        self.branches_waiting_for_eos_message = {}
 
     def start(self):
         # Start playing
@@ -67,139 +122,69 @@ class DynamicPipeline:
                 and structure.has_field("message")
                 and structure.get_value("message").type == Gst.MessageType.EOS
             ):
-                # structure.get_value("message").src == filesink):
 
                 t = structure.get_value("message").type == Gst.MessageType.EOS
                 src = structure.get_value("message").src
                 print("EOS message received: type=%s src=%s" % (str(t), str(src)))
 
-                # Now it's safe to remove everything
-                # self.pipeline.set_state(Gst.State.PAUSED)
+                if src in self.branches_waiting_for_eos_message:
+                    branch = self.branches_waiting_for_eos_message[src]
+                    del self.branches_waiting_for_eos_message[src]
+                    self._delete_branch(branch)
 
-                # # Release the tee pad
-                # self.tee.remove_pad(self.recording_pad)
-                # self.recording_pad = None
-
-                # # Remove elements from pipeline
-                # for element in self.recording_elements:
-                #     element.set_state(Gst.State.NULL)
-                #     self.pipeline.remove(element)
-
-                # self.recording_elements = []
-
-                # # Resume pipeline playback
-                # self.pipeline.set_state(Gst.State.PLAYING)
-
-                # # Remove the message handler
-                # bus.remove_signal_watch()
                 return False
         return True
 
-    def add_recording_branch(self, filename="test.mp4"):
-        # Create recording elements
-        queue_record = Gst.ElementFactory.make("queue", "queue_record")
-        encoder = Gst.ElementFactory.make("x264enc", "encoder")
-        parser = Gst.ElementFactory.make("h264parse", "parser")
-        muxer = Gst.ElementFactory.make("mp4mux", "muxer")
-        filesink = Gst.ElementFactory.make("filesink", "filesink")
-
-        # Configure elements
-        encoder.set_property("tune", "zerolatency")
-        filesink.set_property("location", filename)
-
-        # Store elements for later cleanup
-        self.recording_elements = [queue_record, encoder, parser, muxer, filesink]
-
-        # Add elements to pipeline
-        for element in self.recording_elements:
-            self.pipeline.add(element)
-
-        # Link elements
-        queue_record.link(encoder)
-        encoder.link(parser)
-        parser.link(muxer)
-        muxer.link(filesink)
-
-        # Get tee src pad
-        tee_src_pad_template = self.tee.get_pad_template("src_%u")
-        self.recording_pad = self.tee.request_pad(tee_src_pad_template, None, None)
-        queue_sink_pad = queue_record.get_static_pad("sink")
-        self.recording_pad.link(queue_sink_pad)
-
-        # Set states
-        for element in self.recording_elements:
-            element.sync_state_with_parent()
-
-    def remove_recording_branch(self):
-        if not self.recording_elements:
-            return
-
-        filesink = self.recording_elements[-1]  # Get reference to filesink
-
-        # Get the first element's sink pad and unlink first
-        queue_record = self.recording_elements[0]
-        queue_sink_pad = queue_record.get_static_pad("sink")
-        self.recording_pad.unlink(queue_sink_pad)
-
-        # Now send EOS - it can only go downstream
-        queue_sink_pad.send_event(Gst.Event.new_eos())
-
-        # Wait a bit for EOS to propagate
-        print("Waiting for EOS to propagate...")
-        # time.sleep(0.5)
-        print("EOS propagated")
-
-        # Unlink and remove elements
+    def _delete_branch(self, branch):
+        print("Deleting branch", branch.tee_id)
         self.pipeline.set_state(Gst.State.PAUSED)
 
         # Release the tee pad
-        self.tee.remove_pad(self.recording_pad)
-        self.recording_pad = None
+        self.tee.remove_pad(branch.recording_pad)
 
         # Remove elements from pipeline
-        for element in self.recording_elements:
+        for element in branch.recording_elements:
             element.set_state(Gst.State.NULL)
             self.pipeline.remove(element)
 
-        self.recording_elements = []
-
         # Resume pipeline playback
         self.pipeline.set_state(Gst.State.PLAYING)
+        del self.tee_branches[branch.tee_id]
+
+    def add_branch(self, branch):
+        self.tee_branches[self.next_tee_id] = branch
+        branch.tee_id = self.next_tee_id
+        self.next_tee_id += 1
+        return branch.tee_id
+
+    def add_recording_branch(self, filename="test.mp4"):
+        branch = self.RecordingBranch(self.pipeline, self.tee, filename)
+        return self.add_branch(branch)
+
+    def remove_recording_branch(self, tee_id):
+        branch = self.tee_branches[tee_id]
+        branch.unlink_and_send_eos()
+        self.branches_waiting_for_eos_message[branch.sink()] = branch
 
 
 def main():
     pipeline = DynamicPipeline()
     pipeline.start()
 
-    # Main loop
     loop = GLib.MainLoop()
 
-    def stop_recording():
+    def stop_recording(tee_id):
         print("Removing recording branch...")
-        pipeline.remove_recording_branch()
+        pipeline.remove_recording_branch(tee_id)
         GLib.timeout_add(2000, loop.quit)
         return False
 
     def start_recording():
         print("Adding recording branch...")
-        pipeline.add_recording_branch("output1.mp4")
+        tee_id = pipeline.add_recording_branch("output1.mp4")
 
-        GLib.timeout_add(2000, stop_recording)
+        GLib.timeout_add(20000, lambda: stop_recording(tee_id))
 
-        # Record for 2 seconds
-        # time.sleep(2)
-
-        # print("Adding recording branch...")
-        # pipeline.add_recording_branch("output2.mp4")
-
-        # # Record for 2 seconds
-        # time.sleep(2)
-        # print("Removing recording branch...")
-        # pipeline.remove_recording_branch()
-
-        # Wait a bit more then quit
-        # time.sleep(4)
-        # loop.quit()
         return False
 
     # Schedule the test to run after 2 seconds
@@ -213,6 +198,7 @@ def main():
 
     # Cleanup
     pipeline.pipeline.set_state(Gst.State.NULL)
+    print("Done")
 
 
 if __name__ == "__main__":
