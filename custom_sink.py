@@ -52,7 +52,7 @@ class BailSink(GstBase.BaseSink):
             height = structure.get_value('height')
 
             # Print frame size information
-            print(f">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Received frame with dimensions: {width}x{height}")
+            print(f"Received frame with dimensions: {width}x{height}")
             print(f"Buffer size: {len(map_info.data)} bytes")
 
             buffer.unmap(map_info)
@@ -87,7 +87,7 @@ def main():
     # Create a simple pipeline to test the sink
     # pipeline_str = "videotestsrc num-buffers=5 ! video/x-raw,format=RGB ! bailsink"
     # pipeline_str = "videotestsrc ! video/x-raw,format=RGB ! bailsink"
-    pipeline_str = "videotestsrc ! tee name=t t. ! queue ! videoconvert ! video/x-raw,format=RGB ! bailsink " \
+    pipeline_str = "videotestsrc ! tee name=t t. ! queue ! valve name=valve drop=true ! videoconvert ! video/x-raw,format=RGB ! bailsink " \
                    "t. ! queue ! autovideosink"
     pipeline = Gst.parse_launch(pipeline_str)
 
