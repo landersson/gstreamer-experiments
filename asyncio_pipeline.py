@@ -1,3 +1,7 @@
+"""
+Tests the combination of gstreamer and asyncio, polling the gstreamer pipeline bus using an asyncio callback
+"""
+
 import asyncio
 import gi
 import dynamic_record
@@ -20,29 +24,16 @@ class Recorder:
             while bus.have_pending():
                 msg = bus.pop()
                 self.pipeline.handle_bus_message(bus, msg, None)
-                # if msg.type == Gst.MessageType.ERROR:
-                #     err, debug = msg.parse_error()
-                #     print(f"Error: {err}, Debug: {debug}")
-                # elif msg.type == Gst.MessageType.EOS:
-                #     print("End of stream")
-                # elif msg.type == Gst.MessageType.STATE_CHANGED:
-                #     old_state, new_state, pending_state = msg.parse_state_changed()
-                #     print(
-                #         f"State changed from {old_state.value_nick} to {new_state.value_nick}"
-                #     )
-                # else:
-                #     print(f"Unknown message type: {msg.type}")
-                #     # Get next message if available
 
             await asyncio.sleep(0.1)
 
     async def stop_recording(self, tee_id):
-        print("Removing recording branch...")
+        # print("Removing recording branch...")
         self.pipeline.remove_recording_branch(tee_id)
 
     async def start_recording(self):
-        print("Adding recording branch...")
-        tee_id = self.pipeline.add_recording_branch("output1.mp4")
+        # print("Adding recording branch...")
+        tee_id = self.pipeline.add_recording_branch("asyncio.mp4")
 
         return tee_id
 
@@ -65,8 +56,7 @@ class Recorder:
             await t
         except asyncio.CancelledError:
             pass
-        self.pipeline.pipeline.set_state(Gst.State.NULL)
-        # self.pipeline.stop()
+        self.pipeline.stop()
 
 
 if __name__ == "__main__":

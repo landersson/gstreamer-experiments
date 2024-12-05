@@ -66,7 +66,7 @@ class RecordingBranch(Branch):
 
         self.add_elements([recording_queue, encoder, parser, muxer, filesink])
         self.tee_pad = self.pipeline.add_branch_to_tee(
-            recording_queue.get_static_pad("sink"), "src_%u"
+            recording_queue.get_static_pad("sink")
         )
         self.sync_elements()
 
@@ -107,21 +107,14 @@ class DisplayBranch(Branch):
         # display_sink = Gst.ElementFactory.make("autovideosink", "display")
         display_sink = Gst.ElementFactory.make("xvimagesink", "display")
 
-        # Store elements for later cleanup
         self.add_elements([display_queue, display_sink])
         self.tee_pad = self.pipeline.add_branch_to_tee(
-            display_queue.get_static_pad("sink"), "src_%u"
+            display_queue.get_static_pad("sink")
         )
         self.sync_elements()
 
     def prepare_for_removal(self):
         self.unlink_branch_queue(self.tee_pad)
-        # filesink = self.elements[-1]  # Get reference to filesink
-
-        # Get the first element's sink pad and unlink first
-        # queue = self.elements[0]
-        # queue_sink_pad = queue.get_static_pad("sink")
-        # self.tee_pad.unlink(queue_sink_pad)
 
 
 class DynamicPipeline:
@@ -131,16 +124,18 @@ class DynamicPipeline:
 
     def __init__(self, name, source_elements=[]):
 
-        # Create pipeline with message-forward enabled
         self.pipeline = Gst.Pipeline.new(name)
 
-        # The property "message-forward" needs to be True in order to receive EOS messages on the pipeline bus
-        # from individual elements. Used by RecordingBranch, which needs to wait for the EOS message
-        # from the filesink in order to delay the removal of the branch elements.
+        # The property "message-forward" needs to be True in order to receive
+        # EOS messages on the pipeline bus from individual elements. Used by
+        # RecordingBranch, which needs to wait for the EOS message from the
+        # filesink in order to delay the removal of the branch elements.
         self.pipeline.set_property("message-forward", True)
 
         # Create elements
         self.tee = Gst.ElementFactory.make("tee", "tee")
+
+        # We need to create a dummy branch+queue+sink in order for the pipeline to start
         self.fake_queue = Gst.ElementFactory.make("queue", "fake_queue")
         self.fake_sink = Gst.ElementFactory.make("fakesink", "fake_sink")
 
@@ -169,7 +164,6 @@ class DynamicPipeline:
         bus.connect("message", self.handle_bus_message, None)
 
     def start(self):
-        # Start playing
         self.pipeline.set_state(Gst.State.PLAYING)
 
     def stop(self):
@@ -178,7 +172,7 @@ class DynamicPipeline:
     def add(self, element):
         self.pipeline.add(element)
 
-    def add_branch_to_tee(self, branch_sink_pad, tee_src_pad_name):
+    def add_branch_to_tee(self, branch_sink_pad, tee_src_pad_name="src_%u"):
         tee_src_pad_template = self.tee.get_pad_template(tee_src_pad_name)
         tee_pad = self.tee.request_pad(tee_src_pad_template, None, None)
         tee_pad.link(branch_sink_pad)
@@ -213,7 +207,7 @@ class DynamicPipeline:
         return True
 
     def add_branch(self, branch):
-        """Add a branch to the pipeline tee element and return a numeric id"""
+        """Add a branch to the pipeline tee element and return a numeric identifier"""
         self.tee_branches[self.next_tee_id] = branch
         branch.tee_id = self.next_tee_id
         self.next_tee_id += 1
