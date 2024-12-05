@@ -12,6 +12,9 @@ class WebStreamer:
         self.app = FastAPI(lifespan=self.lifespan)
 
         # Register routes
+        # This line registers a GET endpoint at "/status" that calls the get_status method
+        # When a client makes a GET request to "/status", FastAPI will call self.get_status()
+        # and return its response as JSON
         self.app.get("/status")(self.get_status)
 
     @asynccontextmanager

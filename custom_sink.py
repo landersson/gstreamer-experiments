@@ -1,27 +1,29 @@
 import gi
 import sys
-gi.require_version('Gst', '1.0')
-gi.require_version('GstBase', '1.0')
+
+gi.require_version("Gst", "1.0")
+gi.require_version("GstBase", "1.0")
 from gi.repository import Gst, GstBase
 import numpy as np
 
 # Initialize GStreamer
 Gst.init(None)
 
+
 class BailSink(GstBase.BaseSink):
     __gstmetadata__ = (
-        'Bail Sink',
-        'Sink/Video',
-        'Prints the size of incoming video frames',
-        'Your Name'
+        "Bail Sink",
+        "Sink/Video",
+        "Prints the size of incoming video frames",
+        "Your Name",
     )
 
     __gsttemplates__ = (
         Gst.PadTemplate.new(
-            'sink',
+            "sink",
             Gst.PadDirection.SINK,
             Gst.PadPresence.ALWAYS,
-            Gst.Caps.from_string('video/x-raw,format=RGB')
+            Gst.Caps.from_string("video/x-raw,format=RGB"),
         ),
     )
 
@@ -46,10 +48,10 @@ class BailSink(GstBase.BaseSink):
             caps = self.sinkpad.get_current_caps()
             if not caps:
                 return Gst.FlowReturn.ERROR
-            
+
             structure = caps.get_structure(0)
-            width = structure.get_value('width')
-            height = structure.get_value('height')
+            width = structure.get_value("width")
+            height = structure.get_value("height")
 
             # Print frame size information
             print(f"Received frame with dimensions: {width}x{height}")
@@ -62,8 +64,10 @@ class BailSink(GstBase.BaseSink):
             print(f"Error in render: {str(e)}")
             return Gst.FlowReturn.ERROR
 
+
 def plugin_init(plugin):
     return Gst.Element.register(plugin, "bailsink", Gst.Rank.NONE, BailSink)
+
 
 def register():
     Gst.Plugin.register_static(
@@ -76,19 +80,23 @@ def register():
         "LGPL",
         "bailsink",
         "bailsink",
-        ""
+        "",
     )
+
 
 # Register the plugin
 register()
+
 
 def main():
     print(Gst.version_string())
     # Create a simple pipeline to test the sink
     # pipeline_str = "videotestsrc num-buffers=5 ! video/x-raw,format=RGB ! bailsink"
     # pipeline_str = "videotestsrc ! video/x-raw,format=RGB ! bailsink"
-    pipeline_str = "videotestsrc ! tee name=t t. ! queue ! valve name=valve drop=true ! videoconvert ! video/x-raw,format=RGB ! bailsink " \
-                   "t. ! queue ! autovideosink"
+    pipeline_str = (
+        "videotestsrc ! tee name=t t. ! queue ! valve name=valve drop=true ! videoconvert ! video/x-raw,format=RGB ! bailsink "
+        "t. ! queue ! autovideosink"
+    )
     pipeline = Gst.parse_launch(pipeline_str)
 
     # Start playing
@@ -97,12 +105,12 @@ def main():
     # Wait until error or EOS
     bus = pipeline.get_bus()
     msg = bus.timed_pop_filtered(
-        Gst.CLOCK_TIME_NONE,
-        Gst.MessageType.ERROR | Gst.MessageType.EOS
+        Gst.CLOCK_TIME_NONE, Gst.MessageType.ERROR | Gst.MessageType.EOS
     )
 
     # Free resources
     pipeline.set_state(Gst.State.NULL)
 
-if __name__ == '__main__':
-    main() 
+
+if __name__ == "__main__":
+    main()
