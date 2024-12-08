@@ -20,6 +20,21 @@ def save_dot_file(pipeline, name):
     Gst.debug_bin_to_dot_file(pipeline, Gst.DebugGraphDetails.ALL, name)
 
 
+def print_structure(structure):
+    logger.info("Structure: %s", structure)
+    n_fields = structure.n_fields()
+    logger.info("name=%s", structure.get_name())
+    logger.info("n_fields=%d", n_fields)
+    for i in range(n_fields):
+        field_name = structure.nth_field_name(i)
+        logger.info("  %s=%s", field_name, structure.get_value(field_name))
+
+    if structure.has_field("message"):
+        message = structure.get_value("message")
+        logger.info("message.src: %s", message.src)
+        logger.info("message.type: %s", message.type)
+
+
 class Branch:
     def __init__(self, dynamic_pipeline):
         self.pipeline = dynamic_pipeline
@@ -64,11 +79,14 @@ class RecordingBranch(Branch):
         encoder.set_property("tune", "zerolatency")
         filesink.set_property("location", filename)
 
+        # self.pipeline.pipeline.set_state(Gst.State.PAUSED)
         self.add_elements([recording_queue, encoder, parser, muxer, filesink])
+        self.sync_elements()
         self.tee_pad = self.pipeline.add_branch_to_tee(
             recording_queue.get_static_pad("sink")
         )
-        self.sync_elements()
+        # self.pipeline.pipeline.set_state(Gst.State.PLAYING)
+        save_dot_file(self.pipeline.pipeline, "recording_branch_added")
 
     def prepare_for_removal(self):
         # Unlink the queue from the tee pad
@@ -105,9 +123,10 @@ class DisplayBranch(Branch):
         display_queue = Gst.ElementFactory.make("queue", "display_queue")
         # NOTE: autovideosink seems to hang indefinitely when being removed from pipeline
         # display_sink = Gst.ElementFactory.make("autovideosink", "display")
+        converter = Gst.ElementFactory.make("videoconvert", "converter")
         display_sink = Gst.ElementFactory.make("xvimagesink", "display")
 
-        self.add_elements([display_queue, display_sink])
+        self.add_elements([display_queue, converter, display_sink])
         self.tee_pad = self.pipeline.add_branch_to_tee(
             display_queue.get_static_pad("sink")
         )
@@ -122,6 +141,8 @@ class DynamicPipeline:
     A gstreamer pipeline that supports dynamic addition and removal of various branches.
     """
 
+    error_dot_saved = False
+
     def __init__(self, name, source_elements=[]):
 
         self.pipeline = Gst.Pipeline.new(name)
@@ -134,28 +155,31 @@ class DynamicPipeline:
 
         # Create elements
         self.tee = Gst.ElementFactory.make("tee", "tee")
-
-        # We need to create a dummy branch+queue+sink in order for the pipeline to start
-        self.fake_queue = Gst.ElementFactory.make("queue", "fake_queue")
-        self.fake_sink = Gst.ElementFactory.make("fakesink", "fake_sink")
+        self.pipeline.add(self.tee)
 
         for element in source_elements:
             self.pipeline.add(element)
-
-        self.pipeline.add(self.tee)
-        self.pipeline.add(self.fake_queue)
-        self.pipeline.add(self.fake_sink)
 
         for i in range(len(source_elements) - 1):
             source_elements[i].link(source_elements[i + 1])
         source_elements[-1].link(self.tee)
 
-        self.tee.link(self.fake_queue)
-        self.fake_queue.link(self.fake_sink)
+        self.add_fake_sink()
 
         self.next_tee_id = 0
         self.tee_branches = {}
         self.branches_waiting_for_eos_message = {}
+
+    def add_fake_sink(self):
+        # We need to create a dummy branch+queue+sink in order for the pipeline to start
+        self.fake_queue = Gst.ElementFactory.make("queue", "fake_queue")
+        self.fake_sink = Gst.ElementFactory.make("fakesink", "fake_sink")
+
+        self.pipeline.add(self.fake_queue)
+        self.pipeline.add(self.fake_sink)
+
+        self.tee.link(self.fake_queue)
+        self.fake_queue.link(self.fake_sink)
 
     def add_glib_bus_watch(self):
         # This needs a running glib mainloop to work
@@ -178,6 +202,12 @@ class DynamicPipeline:
         tee_pad.link(branch_sink_pad)
         return tee_pad
 
+    def object_name_short(self, object_name):
+        return str(object_name).split("(")[1].split(")")[0]
+
+    def state_name_short(self, state_name):
+        return str(state_name).split()[1].split("_")[-1]
+
     def handle_bus_message(self, bus, message, _data):
         # logger.info("------------- Message received %s", message.type)
         if message.type == Gst.MessageType.ELEMENT:
@@ -199,15 +229,38 @@ class DynamicPipeline:
                     self.delete_branch(branch)
 
                 return False
+            else:
+                logger.debug("Unhandled ELEMENT message received: src=%s", message.src)
+                # print_structure(message.get_structure())
+                return False
+
         elif message.type == Gst.MessageType.ERROR:
             logger.error("Error message received: %s", message.parse_error())
+            if not self.error_dot_saved:
+                logger.error("Saving error dot file")
+                save_dot_file(self.pipeline, "error")
+                self.error_dot_saved = True
+        elif message.type == Gst.MessageType.WARNING:
+            logger.warning("Warning message received: %s", message.parse_warning())
+        elif message.type == Gst.MessageType.STATE_CHANGED:
+            structure = message.get_structure()
+            old_state, new_state, pending_state = message.parse_state_changed()
+            logger.debug(
+                "State changed: src=%s, %s->%s",
+                self.object_name_short(str(message.src)),
+                self.state_name_short(old_state),
+                self.state_name_short(new_state),
+            )
+        elif message.type == Gst.MessageType.STREAM_STATUS:
+            pass
+            # logger.info("Stream status changed: %s", message.parse_stream_status())
         else:
             pass
             # logger.debug("Unhandled message type: %s", message.type)
         return True
 
     def add_branch(self, branch):
-        """Add a branch to the pipeline tee element and return a numeric identifier"""
+        """Register a new branch and return a numeric identifier for future reference"""
         self.tee_branches[self.next_tee_id] = branch
         branch.tee_id = self.next_tee_id
         self.next_tee_id += 1
@@ -313,14 +366,17 @@ def scenario_2(loop, pipeline):
         tee_id = pipeline.add_display_branch()
         # XXX: If we uncomment this to remove the display branch before adding the recording branch,
         #      caps renegotiation fails and the pipeline stops processing data.
-        # GLib.timeout_add(500, lambda: pipeline.remove_display_branch(tee_id))
+        GLib.timeout_add(500, lambda: pipeline.remove_display_branch(tee_id))
 
         # If we remove the display branch after adding the recording branch, it works fine.
         # GLib.timeout_add(1500, lambda: pipeline.remove_display_branch(tee_id))
         return False
 
     GLib.timeout_add(1000, add_display_branch)
+    # GLib.timeout_add(2000, add_display_branch)
     GLib.timeout_add(2000, start_recording, "output1.mp4")
+    GLib.timeout_add(1200, lambda: save_dot_file(pipeline.pipeline, "disp_added"))
+    GLib.timeout_add(1800, lambda: save_dot_file(pipeline.pipeline, "disp_removed"))
     GLib.timeout_add(5000, loop.quit)
 
 
