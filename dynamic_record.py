@@ -36,12 +36,21 @@ def print_structure(structure):
 
 
 class Branch:
-    def __init__(self, dynamic_pipeline):
-        self.pipeline = dynamic_pipeline
+    def __init__(self):
+        self.pipeline = None
+        self.elements = []
 
-    def add_elements(self, elements):
+    def add_to_pipeline(self, dynamic_pipeline):
+        self.pipeline = dynamic_pipeline
+        self.add_elements()
+        self.pipeline.pipeline.set_state(Gst.State.PAUSED)
+        self.tee_pad = self.pipeline.add_branch_to_tee(self.queue_sink_pad())
+        self.sync_elements()
+        self.pipeline.pipeline.set_state(Gst.State.PLAYING)
+        # save_dot_file(self.pipeline.pipeline, "recording_branch_added")
+
+    def add_elements(self):
         """Add elements to pipeline and link them up"""
-        self.elements = elements
         for element in self.elements:
             self.pipeline.add(element)
 
@@ -52,10 +61,26 @@ class Branch:
         for element in self.elements:
             element.sync_state_with_parent()
 
-    def unlink_branch_queue(self, tee_pad):
+    def remove_branch_from_tee(self):
+        # NOTE: Should only be called when pad is idle/blocked
         queue = self.elements[0]
         queue_sink_pad = queue.get_static_pad("sink")
-        tee_pad.unlink(queue_sink_pad)
+        self.tee_pad.unlink(queue_sink_pad)
+        # XXX: Is it ok to remove pad from tee in pad probe callback?
+        self.pipeline.tee.remove_pad(self.tee_pad)
+
+    def queue_sink_pad(self):
+        return self.elements[0].get_static_pad("sink")
+
+    def initiate_removal(self):
+        self.tee_pad.add_probe(
+            Gst.PadProbeType.IDLE, self._default_remove_branch_probe_cb, None
+        )
+
+    def _default_remove_branch_probe_cb(self, tee_pad, info, _data):
+        self.remove_branch_from_tee()
+        self.pipeline.remove_branch_elements(self)
+        return Gst.PadProbeReturn.REMOVE
 
 
 class RecordingBranch(Branch):
@@ -63,10 +88,11 @@ class RecordingBranch(Branch):
     A branch that records video to a file.
     """
 
-    def __init__(self, dynamic_pipeline, filename):
-        super().__init__(dynamic_pipeline)
+    def __init__(self, filename):
+        super().__init__()
 
         self.filename = filename
+        logger.info("New recording branch writing to %s", filename)
 
         # Create recording elements
         recording_queue = Gst.ElementFactory.make("queue", "recording_queue")
@@ -79,19 +105,14 @@ class RecordingBranch(Branch):
         encoder.set_property("tune", "zerolatency")
         filesink.set_property("location", filename)
 
-        # self.pipeline.pipeline.set_state(Gst.State.PAUSED)
-        self.add_elements([recording_queue, encoder, parser, muxer, filesink])
-        self.sync_elements()
-        self.tee_pad = self.pipeline.add_branch_to_tee(
-            recording_queue.get_static_pad("sink")
-        )
-        # self.pipeline.pipeline.set_state(Gst.State.PLAYING)
-        save_dot_file(self.pipeline.pipeline, "recording_branch_added")
+        self.elements = [recording_queue, encoder, parser, muxer, filesink]
 
-    def prepare_for_removal(self):
-        # Unlink the queue from the tee pad
-        self.unlink_branch_queue(self.tee_pad)
+    def sink(self):
+        return self.elements[-1]
 
+    def _rec_pad_probe_cb(self, tee_pad, info, _data):
+        self.remove_branch_from_tee()
+        # self.pipeline.tee.remove_pad(self.tee_pad)
         # For an mp4 recording branch, we need to send an EOS event downstream in order to
         # make the encoder/muxer/filesink elements flush their buffers and finish writing
         # the video output file properly.
@@ -108,9 +129,10 @@ class RecordingBranch(Branch):
         # which will then unlink and remove the branch.
         logger.info("RecordingBranch: Waiting for EOS to propagate...")
         self.pipeline.branches_waiting_for_eos_message[self.sink()] = self
+        return Gst.PadProbeReturn.REMOVE
 
-    def sink(self):
-        return self.elements[-1]
+    def initiate_removal(self):
+        self.tee_pad.add_probe(Gst.PadProbeType.IDLE, self._rec_pad_probe_cb, self)
 
 
 class DisplayBranch(Branch):
@@ -118,22 +140,15 @@ class DisplayBranch(Branch):
     A branch that displays video on the screen.
     """
 
-    def __init__(self, dynamic_pipeline):
-        super().__init__(dynamic_pipeline)
+    def __init__(self):
+        super().__init__()
         display_queue = Gst.ElementFactory.make("queue", "display_queue")
         # NOTE: autovideosink seems to hang indefinitely when being removed from pipeline
         # display_sink = Gst.ElementFactory.make("autovideosink", "display")
         converter = Gst.ElementFactory.make("videoconvert", "converter")
         display_sink = Gst.ElementFactory.make("xvimagesink", "display")
 
-        self.add_elements([display_queue, converter, display_sink])
-        self.tee_pad = self.pipeline.add_branch_to_tee(
-            display_queue.get_static_pad("sink")
-        )
-        self.sync_elements()
-
-    def prepare_for_removal(self):
-        self.unlink_branch_queue(self.tee_pad)
+        self.elements = [display_queue, converter, display_sink]
 
 
 class DynamicPipeline:
@@ -226,7 +241,8 @@ class DynamicPipeline:
                 if src in self.branches_waiting_for_eos_message:
                     branch = self.branches_waiting_for_eos_message[src]
                     del self.branches_waiting_for_eos_message[src]
-                    self.delete_branch(branch)
+
+                    self.remove_branch_elements(branch)
 
                 return False
             else:
@@ -240,8 +256,10 @@ class DynamicPipeline:
                 logger.error("Saving error dot file")
                 save_dot_file(self.pipeline, "error")
                 self.error_dot_saved = True
+
         elif message.type == Gst.MessageType.WARNING:
             logger.warning("Warning message received: %s", message.parse_warning())
+
         elif message.type == Gst.MessageType.STATE_CHANGED:
             structure = message.get_structure()
             old_state, new_state, pending_state = message.parse_state_changed()
@@ -264,45 +282,21 @@ class DynamicPipeline:
         self.tee_branches[self.next_tee_id] = branch
         branch.tee_id = self.next_tee_id
         self.next_tee_id += 1
+        branch.add_to_pipeline(self)
         return branch.tee_id
 
-    def delete_branch(self, branch):
-        logger.info("Deleting branch %s", branch.tee_id)
-        self.pipeline.set_state(Gst.State.PAUSED)
-
-        # Release the tee pad
-        self.tee.remove_pad(branch.tee_pad)
-
+    def remove_branch_elements(self, branch):
         # Remove elements from pipeline
         for element in branch.elements:
             element.set_state(Gst.State.NULL)
             self.pipeline.remove(element)
 
-        # Resume pipeline playback
-        self.pipeline.set_state(Gst.State.PLAYING)
         del self.tee_branches[branch.tee_id]
 
-    # TODO: Tidy up/refactor this
-    def add_recording_branch(self, filename="test.mp4"):
-        logger.info("Adding recording branch writing to %s", filename)
-        branch = RecordingBranch(self, filename)
-        return self.add_branch(branch)
-
-    def remove_recording_branch(self, tee_id):
-        logger.info("Removing recording branch...")
+    def remove_branch(self, tee_id):
+        logger.info("Removing branch %s", tee_id)
         branch = self.tee_branches[tee_id]
-        branch.prepare_for_removal()
-
-    def add_display_branch(self):
-        logger.info("Adding display branch...")
-        branch = DisplayBranch(self)
-        return self.add_branch(branch)
-
-    def remove_display_branch(self, tee_id):
-        logger.info("Removing display branch...")
-        branch = self.tee_branches[tee_id]
-        branch.prepare_for_removal()
-        self.delete_branch(branch)
+        branch.initiate_removal()
 
 
 def make_test_source(width=1024, height=768):
@@ -342,9 +336,9 @@ def scenario_1(loop, pipeline):
     """
 
     def start_recording(filename):
-        tee_id = pipeline.add_recording_branch(filename)
+        tee_id = pipeline.add_branch(RecordingBranch(filename))
         # Schedule removal of recording branch after 1 second
-        GLib.timeout_add(1000, lambda: pipeline.remove_recording_branch(tee_id))
+        GLib.timeout_add(1000, lambda: pipeline.remove_branch(tee_id))
         return False
 
     GLib.timeout_add(1000, start_recording, "output1.mp4")
@@ -358,15 +352,15 @@ def scenario_2(loop, pipeline):
     """
 
     def start_recording(filename):
-        tee_id = pipeline.add_recording_branch(filename)
-        GLib.timeout_add(1000, lambda: pipeline.remove_recording_branch(tee_id))
+        tee_id = pipeline.add_branch(RecordingBranch(filename))
+        GLib.timeout_add(1000, lambda: pipeline.remove_branch(tee_id))
         return False
 
     def add_display_branch():
-        tee_id = pipeline.add_display_branch()
+        tee_id = pipeline.add_branch(DisplayBranch())
         # XXX: If we uncomment this to remove the display branch before adding the recording branch,
         #      caps renegotiation fails and the pipeline stops processing data.
-        GLib.timeout_add(500, lambda: pipeline.remove_display_branch(tee_id))
+        GLib.timeout_add(500, lambda: pipeline.remove_branch(tee_id))
 
         # If we remove the display branch after adding the recording branch, it works fine.
         # GLib.timeout_add(1500, lambda: pipeline.remove_display_branch(tee_id))
@@ -375,8 +369,8 @@ def scenario_2(loop, pipeline):
     GLib.timeout_add(1000, add_display_branch)
     # GLib.timeout_add(2000, add_display_branch)
     GLib.timeout_add(2000, start_recording, "output1.mp4")
-    GLib.timeout_add(1200, lambda: save_dot_file(pipeline.pipeline, "disp_added"))
-    GLib.timeout_add(1800, lambda: save_dot_file(pipeline.pipeline, "disp_removed"))
+    # GLib.timeout_add(1200, lambda: save_dot_file(pipeline.pipeline, "disp_added"))
+    # GLib.timeout_add(1800, lambda: save_dot_file(pipeline.pipeline, "disp_removed"))
     GLib.timeout_add(5000, loop.quit)
 
 
