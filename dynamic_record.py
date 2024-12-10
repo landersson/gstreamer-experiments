@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 import gi
-import logging
 import sys
 import time
+import logging
+import threading
 
 gi.require_version("Gst", "1.0")
 from gi.repository import Gst, GLib
@@ -36,23 +37,22 @@ def print_structure(structure):
 
 
 class Branch:
-    def __init__(self):
-        self.pipeline = None
+    def __init__(self, name):
+        self.name = name
+        self.dynpipe = None
         self.elements = []
 
     def add_to_pipeline(self, dynamic_pipeline):
-        self.pipeline = dynamic_pipeline
-        self.add_elements()
-        self.pipeline.pipeline.set_state(Gst.State.PAUSED)
-        self.tee_pad = self.pipeline.add_branch_to_tee(self.queue_sink_pad())
+        self.dynpipe = dynamic_pipeline
+        self.add_and_link_elements()
+        self.tee_pad = self.dynpipe.add_branch_to_tee(self)
         self.sync_elements()
-        self.pipeline.pipeline.set_state(Gst.State.PLAYING)
         # save_dot_file(self.pipeline.pipeline, "recording_branch_added")
 
-    def add_elements(self):
+    def add_and_link_elements(self):
         """Add elements to pipeline and link them up"""
         for element in self.elements:
-            self.pipeline.add(element)
+            self.dynpipe.add(element)
 
         for i in range(len(self.elements) - 1):
             self.elements[i].link(self.elements[i + 1])
@@ -61,16 +61,11 @@ class Branch:
         for element in self.elements:
             element.sync_state_with_parent()
 
-    def remove_branch_from_tee(self):
-        # NOTE: Should only be called when pad is idle/blocked
-        queue = self.elements[0]
-        queue_sink_pad = queue.get_static_pad("sink")
-        self.tee_pad.unlink(queue_sink_pad)
-        # XXX: Is it ok to remove pad from tee in pad probe callback?
-        self.pipeline.tee.remove_pad(self.tee_pad)
+    def queue(self):
+        return self.elements[0]
 
     def queue_sink_pad(self):
-        return self.elements[0].get_static_pad("sink")
+        return self.queue().get_static_pad("sink")
 
     def initiate_removal(self):
         self.tee_pad.add_probe(
@@ -78,9 +73,17 @@ class Branch:
         )
 
     def _default_remove_branch_probe_cb(self, tee_pad, info, _data):
-        self.remove_branch_from_tee()
-        self.pipeline.remove_branch_elements(self)
+        tee_pad.remove_probe(info.id)
+        self._remove_branch_from_tee()
+        self.dynpipe.remove_branch_elements(self)
         return Gst.PadProbeReturn.REMOVE
+
+    def _remove_branch_from_tee(self):
+        # NOTE: This method should only be called when pad is idle/blocked
+
+        self.tee_pad.unlink(self.queue_sink_pad())
+        # ???: Is it ok to remove pad from tee in a probe callback for the same pad?
+        self.dynpipe.tee.remove_pad(self.tee_pad)
 
 
 class RecordingBranch(Branch):
@@ -89,7 +92,7 @@ class RecordingBranch(Branch):
     """
 
     def __init__(self, filename):
-        super().__init__()
+        super().__init__("recording")
 
         self.filename = filename
         logger.info("New recording branch writing to %s", filename)
@@ -111,15 +114,30 @@ class RecordingBranch(Branch):
         return self.elements[-1]
 
     def _rec_pad_probe_cb(self, tee_pad, info, _data):
-        self.remove_branch_from_tee()
-        # self.pipeline.tee.remove_pad(self.tee_pad)
+
+        # ???: Apparently, pad probes can be called multiple times.
+        # From: https://coaxion.net/blog/2014/01/gstreamer-dynamic-pipelines/
+        #  "Also it is important to keep in mind that the callback can be called
+        #   multiple times (also at once), and that it can also still be called
+        #   when returning GST_PAD_PROBE_REMOVE from it (another thread might’ve
+        #   just called into it). It is the job of the callback to protect
+        #   against that.""
+        #
+        # ???: Is removing the probe here enough to ensure that we only run the code below once?
+        tee_pad.remove_probe(info.id)
+
+        self._remove_branch_from_tee()
+
         # For an mp4 recording branch, we need to send an EOS event downstream in order to
         # make the encoder/muxer/filesink elements flush their buffers and finish writing
         # the video output file properly.
 
         # Send EOS event on branch queue sink pad - it can only go downstream
-        queue_sink_pad = self.elements[0].get_static_pad("sink")
-        queue_sink_pad.send_event(Gst.Event.new_eos())
+
+        # ???: Is it ok to send EOS event from a probe callback? In this example, a new thread is
+        # created to send the EOS event:
+        # https://gitlab.freedesktop.org/freedesktop/snippets/-/snippets/1760#L81
+        self.queue_sink_pad().send_event(Gst.Event.new_eos())
 
         # Add ourselves to the list of branches waiting for an EOS message. This is done so that we
         # can postpone the removal of branch elements until after the EOS message has been received,
@@ -128,7 +146,7 @@ class RecordingBranch(Branch):
         # EOS message upstream. This EOS message will caught by the custom bus message handler,
         # which will then unlink and remove the branch.
         logger.info("RecordingBranch: Waiting for EOS to propagate...")
-        self.pipeline.branches_waiting_for_eos_message[self.sink()] = self
+        self.dynpipe.branches_waiting_for_eos_message[self.sink()] = self
         return Gst.PadProbeReturn.REMOVE
 
     def initiate_removal(self):
@@ -141,7 +159,8 @@ class DisplayBranch(Branch):
     """
 
     def __init__(self):
-        super().__init__()
+        super().__init__("display")
+        logger.info("New display branch...")
         display_queue = Gst.ElementFactory.make("queue", "display_queue")
         # NOTE: autovideosink seems to hang indefinitely when being removed from pipeline
         # display_sink = Gst.ElementFactory.make("autovideosink", "display")
@@ -211,10 +230,31 @@ class DynamicPipeline:
     def add(self, element):
         self.pipeline.add(element)
 
-    def add_branch_to_tee(self, branch_sink_pad, tee_src_pad_name="src_%u"):
+    # def link_tee_pad_cb(self, tee_pad, info, branch):
+    #     # self.pipeline.set_state(Gst.State.PAUSED)
+    #     tee_pad.link(branch.queue_sink_pad())
+    #     branch.queue().sync_state_with_parent()
+    #     # self.pipeline.set_state(Gst.State.PLAYING)
+    #     return Gst.PadProbeReturn.REMOVE
+
+    def add_branch_to_tee(self, branch, tee_src_pad_name="src_%u"):
+
+        # Add new tee pad to tee element
         tee_src_pad_template = self.tee.get_pad_template(tee_src_pad_name)
         tee_pad = self.tee.request_pad(tee_src_pad_template, None, None)
-        tee_pad.link(branch_sink_pad)
+
+        # ???: In certain cases, we need to set the pipeline to paused before
+        # linking a branch to the tee and then set it back to playing. For
+        # example, this is needed when adding a recording branch after having
+        # added _and_ removed a display branch. Why?
+
+        # self.pipeline.set_state(Gst.State.PAUSED)
+        tee_pad.link(branch.queue_sink_pad())
+        # self.pipeline.set_state(Gst.State.PLAYING)
+        # ???: In general, do we need to use a blocking probe to add a branch to
+        # a tee? Assuming no above.
+
+        # tee_pad.add_probe(Gst.PadProbeType.IDLE, self.link_tee_pad_cb, branch)
         return tee_pad
 
     def object_name_short(self, object_name):
@@ -348,7 +388,10 @@ def scenario_1(loop, pipeline):
 
 def scenario_2(loop, pipeline):
     """
-    Scenario 2: Start display branch after 1 sec, record video between 2 and 3 secs
+    Scenario 2: Start display branch after 1 sec, then remove it after 500ms.
+                Record video between 2 and 3 secs.
+                NOTE: This scenario fails unless we pause the pipeline before adding
+                the recording branch to the tee source pad.
     """
 
     def start_recording(filename):
