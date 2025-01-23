@@ -45,8 +45,10 @@ class Branch:
     def add_to_pipeline(self, dynamic_pipeline):
         self.dynpipe = dynamic_pipeline
         self.add_and_link_elements()
+        for element in self.elements:
+            element.set_state(Gst.State.PLAYING)
         self.tee_pad = self.dynpipe.add_branch_to_tee(self)
-        self.sync_elements()
+        # self.sync_elements()
         # save_dot_file(self.pipeline.pipeline, "recording_branch_added")
 
     def add_and_link_elements(self):
