@@ -2,7 +2,7 @@
 0:00:00.036445116 3471031     0x3ac6e170 DEBUG                GST_BUS gstbus.c:831:gst_bus_source_dispatch:<bus1> source 0x3ae88120 calling dispatch with state-changed message: 0x3ae845a0, time 99:99:99.999999999, seq-num 17, element 'fake_sink', GstMessageStateChanged, old-state=(GstState)null, new-state=(GstState)ready, pending-state=(GstState)void-pending;
 0:00:00.036445419 3471031 0x70dc18000d60 DEBUG                basesrc gstbasesrc.c:1069:gst_base_src_default_fixate:<src> using default caps fixate function
 
-// XXX: videotestsrc fixates format to A444_16LE
+XXX: videotestsrc fixates format to A444_16LE
 
 0:00:00.036457250 3471031 0x70dc18000d60 DEBUG                basesrc gstbasesrc.c:3448:gst_base_src_default_negotiate:<src> fixated to: video/x-raw, format=(string)A444_16LE, width=(int)1024, height=(int)768, framerate=(fraction)30/1, multiview-mode=(string)mono, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive
 
@@ -2367,7 +2367,7 @@
 0:00:01.011367671 3471031 0x70dc18000d60 DEBUG              GST_CLOCK gstclock.c:1129:gst_clock_get_time:<GstSystemClock> adjusted time 262:49:10.193627317
 0:00:01.011370300 3471031 0x70dc18000d60 DEBUG              GST_CLOCK gstsystemclock.c:1150:gst_system_clock_id_wait_jitter_unlocked:<GstSystemClock> entry 0x70dc0c082580 time 262:49:10.224158998 now 262:49:10.193627317 diff (time-now) 30531681
 
-// XXX: Adding display branch
+XXX: Adding display branch
 
  1059 - INFO - New display branch...
 0:00:01.038205594 3471031     0x3ac6e170 DEBUG     GST_PLUGIN_LOADING gstpluginfeature.c:106:gst_plugin_feature_load: loading plugin for feature 0x3ad1b140; 'queue'
@@ -3744,7 +3744,7 @@
 0:00:01.078772467 3471031 0x70dc18000d60 DEBUG                basesrc gstbasesrc.c:3440:gst_base_src_default_negotiate:<src> have caps: video/x-raw, format=(string)YV12, width=(int)1024, height=(int)768, framerate=(fraction)[ 0/1, 2147483647/1 ], multiview-mode=(string){ mono, left, right }; video/x-raw, format=(string)I420, width=(int)1024, height=(int)768, framerate=(fraction)[ 0/1, 2147483647/1 ], multiview-mode=(string){ mono, left, right }; video/x-raw, format=(string)NV12, width=(int)1024, height=(int)768, framerate=(fraction)[ 0/1, 2147483647/1 ], multiview-mode=(string){ mono, left, right }; video/x-raw, format=(string){ A444_16LE, A444_16BE, AYUV64, RGBA64_LE, ARGB64, ARGB64_LE, BGRA64_LE, ABGR64_LE, RGBA64_BE, ARGB64_BE, BGRA64_BE, ABGR64_BE, A422_16LE, A422_16BE, A420_16LE, A420_16BE, A444_12LE, GBRA_12LE, A444_12BE, GBRA_12BE, Y412_LE, Y412_BE, A422_12LE, A422_12BE, A420_12LE, A420_12BE, A444_10LE, GBRA_10LE, A444_10BE, GBRA_10BE, A422_10LE, A422_10BE, A420_10LE, A420_10BE, BGR10A2_LE, RGB10A2_LE, Y410, A444, GBRA, AYUV, VUYA, RGBA, RBGA, ARGB, BGRA, ABGR, A422, A420, AV12, Y444_16LE, GBR_16LE, Y444_16BE, GBR_16BE, v216, P016_LE, P016_BE, Y444_12LE, GBR_12LE, Y444_12BE, GBR_12BE, I422_12LE, I422_12BE, Y212_LE, Y212_BE, I420_12LE, I420_12BE, P012_LE, P012_BE, Y444_10LE, GBR_10LE, Y444_10BE, GBR_10BE, r210, I422_10LE, I422_10BE, NV16_10LE32, Y210, UYVP, v210, I420_10LE, I420_10BE, P010_10LE, NV12_10LE40, NV12_10LE32, P010_10BE, MT2110R, MT2110T, NV12_10BE_8L128, NV12_10LE40_4L4, Y444, BGRP, GBR, RGBP, NV24, v308, IYU2, RGBx, xRGB, BGRx, xBGR, RGB, BGR, Y42B, NV16, NV61, YUY2, YVYU, UYVY, VYUY, I420, YV12, NV12, NV21, NV12_16L32S, NV12_32L32, NV12_4L4, NV12_64Z32, NV12_8L128, Y41B, IYU1, YUV9, YVU9, BGR16, RGB16, BGR15, RGB15, RGB8P, GRAY16_LE, GRAY16_BE, GRAY10_LE32, GRAY8 }, width=(int)1024, height=(int)768, framerate=(fraction)[ 0/1, 2147483647/1 ], multiview-mode=(string){ mono, left, right }
 0:00:01.078780343 3471031 0x70dc18000d60 DEBUG                basesrc gstbasesrc.c:1069:gst_base_src_default_fixate:<src> using default caps fixate function
 
-// XXX: videotestsrc fixates format to YV12
+XXX: videotestsrc fixates format to YV12
 
 0:00:01.078785015 3471031 0x70dc18000d60 DEBUG                basesrc gstbasesrc.c:3448:gst_base_src_default_negotiate:<src> fixated to: video/x-raw, format=(string)YV12, width=(int)1024, height=(int)768, framerate=(fraction)30/1, multiview-mode=(string)mono, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive
 
@@ -7528,7 +7528,7 @@
 0:00:02.010150975 3471031 0x70dc18000d60 DEBUG              GST_CLOCK gstclock.c:1129:gst_clock_get_time:<GstSystemClock> adjusted time 262:49:11.192410884
 0:00:02.010153560 3471031 0x70dc18000d60 DEBUG              GST_CLOCK gstsystemclock.c:1150:gst_system_clock_id_wait_jitter_unlocked:<GstSystemClock> entry 0x70dc0c0198e0 time 262:49:11.224158997 now 262:49:11.192410884 diff (time-now) 31748113
 
-// XXX: Adding recording branch
+XXX: Adding recording branch
 
  2058 - INFO - New recording branch writing to output1.mp4
 0:00:02.037013972 3471031     0x3ac6e170 DEBUG     GST_PLUGIN_LOADING gstpluginfeature.c:106:gst_plugin_feature_load: loading plugin for feature 0x3ad1b140; 'queue'
@@ -8947,8 +8947,7 @@
 0:00:02.044147182 3471031 0x70dc18000f50 DEBUG           videoencoder gstvideoencoder.c:988:gst_video_encoder_sink_query:<encoder> received query 40963, accept-caps
 0:00:02.044139765 3471031 0x70dc18000b70 DEBUG               GST_PADS gstpad.c:5424:store_sticky_event:<fake_sink:sink> notify caps
 
-
-// XXX: x264enc receives accept-caps query for format YV12
+XXX: x264enc receives accept-caps query for format YV12
 
 0:00:02.044150964 3471031 0x70dc18000f50 DEBUG                x264enc gstx264enc.c:922:gst_x264_enc_sink_query: Received accept-caps query on sinkpad, accept-caps query: 0x70dc08023a40, GstQueryAcceptCaps, caps=(GstCaps)"video/x-raw\,\ format\=\(string\)YV12\,\ width\=\(int\)1024\,\ height\=\(int\)768\,\ framerate\=\(fraction\)30/1\,\ multiview-mode\=\(string\)mono\,\ pixel-aspect-ratio\=\(fraction\)1/1\,\ interlace-mode\=\(string\)progressive", result=(boolean)false;
 0:00:02.044153117 3471031 0x70dc18000b70 DEBUG               GST_PADS gstpad.c:4092:push_sticky:<fake_queue:src> event caps marked received
@@ -8957,6 +8956,9 @@
 0:00:02.044155026 3471031 0x70dc18000f50 DEBUG               GST_PADS gstpad.c:4232:gst_pad_query:<encoder:sink> sent query 0x70dc08023a40 (accept-caps), result 1
 0:00:02.044160891 3471031 0x70dc18000f50 DEBUG               GST_CAPS gstutils.c:3202:gst_pad_query_accept_caps:<encoder:sink> query returned 1
 0:00:02.044162610 3471031 0x70dc18000f50 DEBUG           videoencoder gstvideoencoder.c:1303:gst_video_encoder_sink_event:<encoder> received event 12814, caps
+
+XXX: x264enc accepts format YV12
+
 0:00:02.044164976 3471031 0x70dc18000f50 DEBUG           videoencoder gstvideoencoder.c:730:gst_video_encoder_setcaps:<encoder> setcaps video/x-raw, format=(string)YV12, width=(int)1024, height=(int)768, framerate=(fraction)30/1, multiview-mode=(string)mono, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive
 0:00:02.044169910 3471031 0x70dc18000f50 DEBUG             video-info video-info.c:406:gst_video_info_from_caps: parsing caps video/x-raw, format=(string)YV12, width=(int)1024, height=(int)768, framerate=(fraction)30/1, multiview-mode=(string)mono, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive
 0:00:02.044173864 3471031 0x70dc18000f50 DEBUG             video-info video-info.c:528:gst_video_info_from_caps: no colorimetry, using default
@@ -9126,6 +9128,7 @@
 0:00:02.044951683 3471031 0x70dc18000d60 DEBUG               GST_CAPS gstpad.c:2871:gst_pad_get_allowed_caps:<encoder:src> allowed caps video/x-h264, framerate=(fraction)[ 0/1, 2147483647/1 ], width=(int)[ 16, 2147483647 ], height=(int)[ 16, 2147483647 ], profile=(string){ high-4:4:4, high-4:2:2, high-10, high, main, baseline, constrained-baseline, high-4:4:4-intra, high-4:2:2-intra, high-10-intra }, stream-format=(string)avc, alignment=(string)au; video/x-h264, framerate=(fraction)[ 0/1, 2147483647/1 ], width=(int)[ 16, 2147483647 ], height=(int)[ 16, 2147483647 ], profile=(string){ high-4:4:4, high-4:2:2, high-10, high, main, baseline, constrained-baseline, high-4:4:4-intra, high-4:2:2-intra, high-10-intra }, stream-format=(string){ avc, byte-stream }, alignment=(string)au
 0:00:02.044975999 3471031 0x70dc18000d60 DEBUG               GST_PADS gstpad.c:4232:gst_pad_query:<encoder:sink> sent query 0x70dc0c1d12e0 (caps), result 1
 
+XXX: Y444_10LE ends up being the preferred recording_queue src format here... Why?
 
 0:00:02.044979404 3471031 0x70dc18000d60 DEBUG               GST_PADS gstutils.c:2819:query_caps_func:<recording_queue:src> intersect with result video/x-raw, width=(int)1024, height=(int)768, framerate=(fraction)[ 0/1, 2147483647/1 ], format=(string){ Y444, Y42B, I420, YV12, NV12, GRAY8, Y444_10LE, I422_10LE, I420_10LE }, multiview-mode=(string){ mono, left, right }
 
@@ -9163,7 +9166,7 @@
 0:00:02.045178171 3471031 0x70dc18000d60 DEBUG                basesrc gstbasesrc.c:3440:gst_base_src_default_negotiate:<src> have caps: video/x-raw, format=(string){ Y444_10LE, I422_10LE, I420_10LE, Y444, Y42B, I420, YV12, NV12, GRAY8 }, width=(int)1024, height=(int)768, framerate=(fraction)[ 0/1, 2147483647/1 ], multiview-mode=(string){ mono, left, right }
 0:00:02.045182475 3471031 0x70dc18000d60 DEBUG                basesrc gstbasesrc.c:1069:gst_base_src_default_fixate:<src> using default caps fixate function
 
-// XXX: videotestsrc fixates format to Y444_10LE (Why?)
+XXX: videotestsrc fixates format to Y444_10LE here... just becase it's first in the list?
 
 0:00:02.045185617 3471031 0x70dc18000d60 DEBUG                basesrc gstbasesrc.c:3448:gst_base_src_default_negotiate:<src> fixated to: video/x-raw, format=(string)Y444_10LE, width=(int)1024, height=(int)768, framerate=(fraction)30/1, multiview-mode=(string)mono, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive
 0:00:02.045188472 3471031 0x70dc18000d60 DEBUG               GST_CAPS gstpad.c:2768:gst_pad_get_current_caps:<src:src> get current pad caps video/x-raw, format=(string)YV12, width=(int)1024, height=(int)768, framerate=(fraction)30/1, multiview-mode=(string)mono, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive
@@ -9420,7 +9423,7 @@
 0:00:02.045877190 3471031 0x70dc18000d60 DEBUG               GST_PADS gstpad.c:4209:gst_pad_query:<encoder:sink> doing query 0x70dc0c1d12e0 (caps)
 0:00:02.045878670 3471031 0x70dc18000d60 DEBUG           videoencoder gstvideoencoder.c:988:gst_video_encoder_sink_query:<encoder> received query 43523, caps
 
-// XXX: encoder receives Y444_10LE caps query
+XXX: encoder receives Y444_10LE caps query
 
 0:00:02.045883436 3471031 0x70dc18000d60 DEBUG                x264enc gstx264enc.c:922:gst_x264_enc_sink_query: Received caps query on sinkpad, caps query: 0x70dc0c1d12e0, GstQueryCaps, filter=(GstCaps)"video/x-raw\(memory:SystemMemory\,\ meta:GstVideoOverlayComposition\)\,\ format\=\(string\)Y444_10LE\,\ width\=\(int\)1024\,\ height\=\(int\)768\,\ framerate\=\(fraction\)30/1\,\ multiview-mode\=\(string\)mono\,\ pixel-aspect-ratio\=\(fraction\)1/1\,\ interlace-mode\=\(string\)progressive", caps=(GstCaps)"video/x-raw\(memory:SystemMemory\,\ meta:GstVideoOverlayComposition\)\,\ format\=\(string\)Y444_10LE\,\ width\=\(int\)1024\,\ height\=\(int\)768\,\ framerate\=\(fraction\)30/1\,\ multiview-mode\=\(string\)mono\,\ pixel-aspect-ratio\=\(fraction\)1/1\,\ interlace-mode\=\(string\)progressive";
 0:00:02.045886279 3471031 0x70dc18000d60 DEBUG         GST_PROPERTIES gstpad.c:2853:gst_pad_get_allowed_caps:<encoder:src> getting allowed caps
@@ -9466,11 +9469,11 @@
 0:00:02.045993506 3471031 0x70dc18000d60 DEBUG               GST_CAPS gstutils.c:3166:gst_pad_peer_query_caps:<timeoverlay:src> peer query returned EMPTY
 0:00:02.045995044 3471031 0x70dc18000d60 DEBUG        basetextoverlay gstbasetextoverlay.c:896:gst_base_text_overlay_negotiate:<timeoverlay> caps have overlay meta 0
 
-// XXX: timeoverlay uses Y444_10LE
+XXX: timeoverlay uses Y444_10LE
 
 0:00:02.045998554 3471031 0x70dc18000d60 DEBUG        basetextoverlay gstbasetextoverlay.c:968:gst_base_text_overlay_negotiate:<timeoverlay> Using caps video/x-raw, format=(string)Y444_10LE, width=(int)1024, height=(int)768, framerate=(fraction)30/1, multiview-mode=(string)mono, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive
 
-// XXX: timeoverlay sends Y444_10LE caps event downstream
+XXX: timeoverlay sends Y444_10LE caps event downstream
 
 0:00:02.046001154 3471031 0x70dc18000d60 INFO               GST_EVENT gstevent.c:918:gst_event_new_caps: creating caps event video/x-raw, format=(string)Y444_10LE, width=(int)1024, height=(int)768, framerate=(fraction)30/1, multiview-mode=(string)mono, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive
 0:00:02.046003419 3471031 0x70dc18000d60 DEBUG              GST_EVENT gstevent.c:337:gst_event_new_custom: creating new event 0x70dc0c1d4540 caps 12814
@@ -9547,6 +9550,9 @@
 0:00:02.046145985 3471031 0x70dc18000d60 DEBUG               GST_PADS gstpad.c:4065:push_sticky:<tee:src_2> event stream-start was already received
 0:00:02.046144397 3471031 0x70dc18000b70 DEBUG               GST_PADS gstpad.c:4141:check_sticky:<fake_queue:src> pushing all sticky events
 0:00:02.046149767 3471031 0x70dc18000d60 DEBUG              GST_EVENT gstpad.c:5892:gst_pad_send_event_unchecked:<recording_queue:sink> have event type caps event: 0x70dc0c1d4540, time 99:99:99.999999999, seq-num 168, GstEventCaps, caps=(GstCaps)"video/x-raw\,\ format\=\(string\)Y444_10LE\,\ width\=\(int\)1024\,\ height\=\(int\)768\,\ framerate\=\(fraction\)30/1\,\ multiview-mode\=\(string\)mono\,\ pixel-aspect-ratio\=\(fraction\)1/1\,\ interlace-mode\=\(string\)progressive";
+
+XXX: recording_queue receives accept-caps query for format Y444_10LE
+
 0:00:02.046153659 3471031 0x70dc18000d60 DEBUG               GST_CAPS gstutils.c:3196:gst_pad_query_accept_caps:<recording_queue:sink> accept caps of video/x-raw, format=(string)Y444_10LE, width=(int)1024, height=(int)768, framerate=(fraction)30/1, multiview-mode=(string)mono, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive
 0:00:02.046156303 3471031 0x70dc18000d60 DEBUG                  query gstquery.c:680:gst_query_new_custom: creating new query 0x70dc0c06e600 accept-caps
 0:00:02.046157829 3471031 0x70dc18000d60 DEBUG               GST_PADS gstpad.c:4209:gst_pad_query:<recording_queue:sink> doing query 0x70dc0c06e600 (accept-caps)
@@ -9559,7 +9565,7 @@
 0:00:02.046170924 3471031 0x70dc18000d60 DEBUG           videoencoder gstvideoencoder.c:988:gst_video_encoder_sink_query:<encoder> received query 40963, accept-caps
 0:00:02.046164482 3471031 0x70dc18000b70 DEBUG              GST_EVENT gstpad.c:5892:gst_pad_send_event_unchecked:<fake_sink:sink> have event type caps event: 0x70dc0c1d4540, time 99:99:99.999999999, seq-num 168, GstEventCaps, caps=(GstCaps)"video/x-raw\,\ format\=\(string\)Y444_10LE\,\ width\=\(int\)1024\,\ height\=\(int\)768\,\ framerate\=\(fraction\)30/1\,\ multiview-mode\=\(string\)mono\,\ pixel-aspect-ratio\=\(fraction\)1/1\,\ interlace-mode\=\(string\)progressive";
 
-// XXX: x264enc receives accept-caps query for format Y444_10LE
+XXX: x264enc receives accept-caps query for format Y444_10LE
 
 0:00:02.046174703 3471031 0x70dc18000d60 DEBUG                x264enc gstx264enc.c:922:gst_x264_enc_sink_query: Received accept-caps query on sinkpad, accept-caps query: 0x70dc0c06e600, GstQueryAcceptCaps, caps=(GstCaps)"video/x-raw\,\ format\=\(string\)Y444_10LE\,\ width\=\(int\)1024\,\ height\=\(int\)768\,\ framerate\=\(fraction\)30/1\,\ multiview-mode\=\(string\)mono\,\ pixel-aspect-ratio\=\(fraction\)1/1\,\ interlace-mode\=\(string\)progressive", result=(boolean)false;
 
@@ -9621,7 +9627,7 @@
 0:00:02.046311170 3471031 0x70dc18000b70 DEBUG             GST_MEMORY gstmemory.c:139:gst_memory_init: new memory 0x70dc140048c0, maxsize:1179655 offset:0 size:1179648
 0:00:02.046313670 3471031 0x70dc18000b70 DEBUG        GST_PERFORMANCE gstallocator.c:495:_sysmem_copy: memcpy 1179648 memory 0x70dc26470010 -> 0x70dc140048c0
 
-// XXX: x264enc 4:2:0 profile
+XXX: x264enc picks 4:2:0 profile... Due to YV12 input format?
 
 0:00:02.046352780 3471031 0x70dc18000f50 INFO                 x264enc gstx264enc.c:1289:gst_x264_enc_log_callback:<encoder> profile High, level 3.1, 4:2:0, 8-bit
 
@@ -9697,7 +9703,7 @@
 0:00:02.047010411 3471031 0x70dc18000f50 DEBUG               GST_PADS gstpad.c:4232:gst_pad_query:<parser:sink> sent query 0x70dc08017f60 (caps), result 1
 0:00:02.047016570 3471031 0x70dc18000f50 DEBUG               GST_CAPS gstpad.c:2871:gst_pad_get_allowed_caps:<encoder:src> allowed caps video/x-h264, framerate=(fraction)[ 0/1, 2147483647/1 ], width=(int)[ 16, 2147483647 ], height=(int)[ 16, 2147483647 ], profile=(string){ high-4:4:4, high-4:2:2, high-10, high, main, baseline, constrained-baseline, high-4:4:4-intra, high-4:2:2-intra, high-10-intra }, stream-format=(string)avc, alignment=(string)au; video/x-h264, framerate=(fraction)[ 0/1, 2147483647/1 ], width=(int)[ 16, 2147483647 ], height=(int)[ 16, 2147483647 ], profile=(string){ high-4:4:4, high-4:2:2, high-10, high, main, baseline, constrained-baseline, high-4:4:4-intra, high-4:2:2-intra, high-10-intra }, stream-format=(string){ avc, byte-stream }, alignment=(string)au
 
-// XXX: x264enc sets output caps to "high"
+XXX: x264enc sets output caps to "high"
 
 0:00:02.047024864 3471031 0x70dc18000f50 DEBUG                x264enc gstx264enc.c:2263:gst_x264_enc_set_src_caps:<encoder> output caps: video/x-h264, codec_data=(buffer)0164001fffe1001d6764001facb200800c3602d40404050000030001000003003c8f18324801000568ebccb22c, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high
 0:00:02.047031023 3471031 0x70dc18000f50 DEBUG           videoencoder gstvideoencoder.c:3033:gst_video_encoder_merge_tags:<encoder> setting encoder tags to taglist, encoder=(string)x264, encoder-version=(uint)164, maximum-bitrate=(uint)2097152, nominal-bitrate=(uint)2097152;
@@ -9753,7 +9759,7 @@
 0:00:02.052855731 3471031 0x70dc18000f50 DEBUG               GST_CAPS gstpad.c:2768:gst_pad_get_current_caps:<encoder:src> get current pad caps (NULL)
 0:00:02.052861384 3471031 0x70dc18001140 DEBUG             aggregator gstaggregator.c:1763:gst_aggregator_default_sink_event:<muxer:video_0> Got event: stream-start event: 0x70dc0c002df0, time 99:99:99.999999999, seq-num 40, GstEventStreamStart, stream-id=(string)2702fdae8c9faeb4f646c960becf943d, flags=(GstStreamFlags)GST_STREAM_FLAG_NONE, group-id=(uint)1;
 
-// XXX: New fixed profile "high" caps event created (by encoder?)
+XXX: New fixed profile "high" caps event created (by encoder?)
 
 0:00:02.052867143 3471031 0x70dc18000f50 INFO               GST_EVENT gstevent.c:918:gst_event_new_caps: creating caps event video/x-h264, codec_data=(buffer)0164001fffe1001d6764001facb200800c3602d40404050000030001000003003c8f18324801000568ebccb22c, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, width=(int)1024, height=(int)768, pixel-aspect-ratio=(fraction)1/1, framerate=(fraction)30/1, interlace-mode=(string)progressive, colorimetry=(string)bt709, chroma-site=(string)mpeg2, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono
 0:00:02.052872308 3471031 0x70dc18000f50 DEBUG              GST_EVENT gstevent.c:337:gst_event_new_custom: creating new event 0x70dc08372020 caps 12814
@@ -9856,7 +9862,7 @@
 0:00:02.053174927 3471031     0x3ac6e170 DEBUG                GST_BUS gstbus.c:837:gst_bus_source_dispatch:<bus1> source 0x3ae88120 handler returns 1
 0:00:02.053176881 3471031 0x70dc18000f50 DEBUG               GST_CAPS gstpad.c:2768:gst_pad_get_current_caps:<parser:src> get current pad caps (NULL)
 
-// XXX: New fixed 4:2:0 caps event created (by parser)
+XXX: New fixed 4:2:0 caps event created (by parser)
 
 0:00:02.053190009 3471031 0x70dc18000f50 INFO               GST_EVENT gstevent.c:918:gst_event_new_caps: creating caps event video/x-h264, codec_data=(buffer)0164001fffe1001d6764001facb200800c3602d40404050000030001000003003c8f18324801000568ebccb22c, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, width=(int)1024, height=(int)768, pixel-aspect-ratio=(fraction)1/1, framerate=(fraction)30/1, interlace-mode=(string)progressive, colorimetry=(string)bt709, chroma-site=(string)mpeg2, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, coded-picture-structure=(string)frame, chroma-format=(string)4:2:0, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, parsed=(boolean)true
 0:00:02.053193828 3471031 0x70dc18000f50 DEBUG              GST_EVENT gstevent.c:337:gst_event_new_custom: creating new event 0x70dc0801ece0 caps 12814
@@ -9865,7 +9871,7 @@
 0:00:02.053198260 3471031 0x70dc18000f50 DEBUG               GST_PADS gstpad.c:4065:push_sticky:<parser:src> event stream-start was already received
 0:00:02.053208530 3471031 0x70dc18000f50 DEBUG              GST_EVENT gstpad.c:5892:gst_pad_send_event_unchecked:<muxer:video_0> have event type caps event: 0x70dc0801ece0, time 99:99:99.999999999, seq-num 172, GstEventCaps, caps=(GstCaps)"video/x-h264\,\ codec_data\=\(buffer\)0164001fffe1001d6764001facb200800c3602d40404050000030001000003003c8f18324801000568ebccb22c\,\ stream-format\=\(string\)avc\,\ alignment\=\(string\)au\,\ level\=\(string\)3.1\,\ profile\=\(string\)high\,\ width\=\(int\)1024\,\ height\=\(int\)768\,\ pixel-aspect-ratio\=\(fraction\)1/1\,\ framerate\=\(fraction\)30/1\,\ interlace-mode\=\(string\)progressive\,\ colorimetry\=\(string\)bt709\,\ chroma-site\=\(string\)mpeg2\,\ multiview-mode\=\(string\)mono\,\ multiview-flags\=\(GstVideoMultiviewFlagsSet\)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono\,\ coded-picture-structure\=\(string\)frame\,\ chroma-format\=\(string\)4:2:0\,\ bit-depth-luma\=\(uint\)8\,\ bit-depth-chroma\=\(uint\)8\,\ parsed\=\(boolean\)true";
 
-//XXX: muxer accepts 4:2:0 chroma-format
+XXX: muxer accepts 4:2:0 chroma-format
 
 0:00:02.053216798 3471031 0x70dc18000f50 DEBUG               GST_CAPS gstutils.c:3196:gst_pad_query_accept_caps:<muxer:video_0> accept caps of video/x-h264, codec_data=(buffer)0164001fffe1001d6764001facb200800c3602d40404050000030001000003003c8f18324801000568ebccb22c, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, width=(int)1024, height=(int)768, pixel-aspect-ratio=(fraction)1/1, framerate=(fraction)30/1, interlace-mode=(string)progressive, colorimetry=(string)bt709, chroma-site=(string)mpeg2, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, coded-picture-structure=(string)frame, chroma-format=(string)4:2:0, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, parsed=(boolean)true
 
@@ -9889,7 +9895,7 @@
 0:00:02.053309178 3471031 0x70dc18000f50 DEBUG               GST_PADS gstpad.c:4232:gst_pad_query:<muxer:video_0> sent query 0x70dc08017e60 (accept-caps), result 1
 0:00:02.053310721 3471031 0x70dc18000f50 DEBUG               GST_CAPS gstutils.c:3202:gst_pad_query_accept_caps:<muxer:video_0> query returned 1
 
-// XXX: qtmux accepts 4:2:0 caps
+XXX: qtmux accepts 4:2:0 caps
 
 0:00:02.053316933 3471031 0x70dc18000f50 DEBUG                  qtmux gstqtmux.c:5804:gst_qt_mux_can_renegotiate:<muxer> pad video_0 accepted caps video/x-h264, codec_data=(buffer)0164001fffe1001d6764001facb200800c3602d40404050000030001000003003c8f18324801000568ebccb22c, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, width=(int)1024, height=(int)768, pixel-aspect-ratio=(fraction)1/1, framerate=(fraction)30/1, interlace-mode=(string)progressive, colorimetry=(string)bt709, chroma-site=(string)mpeg2, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, coded-picture-structure=(string)frame, chroma-format=(string)4:2:0, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, parsed=(boolean)true
 
@@ -9916,7 +9922,7 @@
 0:00:02.053385858 3471031 0x70dc18001140 DEBUG             aggregator gstaggregator.c:2748:gst_aggregator_default_sink_query:<muxer> ALLOCATION ret 0, allocation query: 0x70dc08366180, GstQueryAllocation, caps=(GstCaps)"video/x-h264\,\ codec_data\=\(buffer\)0164001fffe1001d6764001facb200800c3602d40404050000030001000003003c8f18324801000568ebccb22c\,\ stream-format\=\(string\)avc\,\ alignment\=\(string\)au\,\ level\=\(string\)3.1\,\ profile\=\(string\)high\,\ width\=\(int\)1024\,\ height\=\(int\)768\,\ pixel-aspect-ratio\=\(fraction\)1/1\,\ framerate\=\(fraction\)30/1\,\ interlace-mode\=\(string\)progressive\,\ colorimetry\=\(string\)bt709\,\ chroma-site\=\(string\)mpeg2\,\ multiview-mode\=\(string\)mono\,\ multiview-flags\=\(GstVideoMultiviewFlagsSet\)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono", need-pool=(boolean)true;
 0:00:02.053392561 3471031 0x70dc18000f50 DEBUG               GST_PADS gstpad.c:4232:gst_pad_query:<muxer:video_0> sent query 0x70dc08366180 (allocation), result 0
 
-// XXX: Allocation query failed?
+XXX: Allocation query failed?
 
 0:00:02.053394070 3471031 0x70dc18000f50 DEBUG               GST_PADS gstpad.c:4281:gst_pad_query:<muxer:video_0> query failed
 
@@ -10125,7 +10131,7 @@
 0:00:02.053844168 3471031 0x70dc18000f50 DEBUG             GST_MEMORY gstmemory.c:139:gst_memory_init: new memory 0x70dc08383050, maxsize:6951 offset:0 size:6944
 0:00:02.053846706 3471031 0x70dc18000f50 DEBUG      codecparsers_h264 gsth264parser.c:1616:gst_h264_parser_identify_nalu_avc: Can't parse, buffer has too small size 26476, offset 26476
 
-// XXX: parser src is 4:2:0
+XXX: parser src is 4:2:0
 
 0:00:02.053854313 3471031 0x70dc18000f50 DEBUG               GST_CAPS gstpad.c:2740:gst_pad_has_current_caps:<parser:src> check current pad caps video/x-h264, codec_data=(buffer)0164001fffe1001d6764001facb200800c3602d40404050000030001000003003c8f18324801000568ebccb22c, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, width=(int)1024, height=(int)768, pixel-aspect-ratio=(fraction)1/1, framerate=(fraction)30/1, interlace-mode=(string)progressive, colorimetry=(string)bt709, chroma-site=(string)mpeg2, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, coded-picture-structure=(string)frame, chroma-format=(string)4:2:0, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, parsed=(boolean)true
 0:00:02.053860731 3471031 0x70dc18000f50 DEBUG               GST_CAPS gstpad.c:2768:gst_pad_get_current_caps:<parser:sink> get current pad caps video/x-h264, codec_data=(buffer)0164001fffe1001d6764001facb200800c3602d40404050000030001000003003c8f18324801000568ebccb22c, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, width=(int)1024, height=(int)768, pixel-aspect-ratio=(fraction)1/1, framerate=(fraction)30/1, interlace-mode=(string)progressive, colorimetry=(string)bt709, chroma-site=(string)mpeg2, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono
@@ -10300,13 +10306,13 @@
 0:00:02.054250560 3471031 0x70dc18001140 DEBUG              GST_EVENT gstpad.c:5892:gst_pad_send_event_unchecked:<filesink:sink> have event type stream-start event: 0x70dbfc003ae0, time 99:99:99.999999999, seq-num 178, GstEventStreamStart, stream-id=(string)agg-83f073d0, flags=(GstStreamFlags)GST_STREAM_FLAG_NONE;
 0:00:02.054251837 3471031 0x70dc18000f50 DEBUG               GST_PADS gstpad.c:4065:push_sticky:<recording_queue:src> event stream-start was already received
 
-// XXX: caps event with format Y444_10LE on encoder::sink ?
+XXX: caps event with format Y444_10LE on encoder::sink ?
 
 0:00:02.054258123 3471031 0x70dc18000f50 DEBUG              GST_EVENT gstpad.c:5892:gst_pad_send_event_unchecked:<encoder:sink> have event type caps event: 0x70dc0c1d4540, time 99:99:99.999999999, seq-num 168, GstEventCaps, caps=(GstCaps)"video/x-raw\,\ format\=\(string\)Y444_10LE\,\ width\=\(int\)1024\,\ height\=\(int\)768\,\ framerate\=\(fraction\)30/1\,\ multiview-mode\=\(string\)mono\,\ pixel-aspect-ratio\=\(fraction\)1/1\,\ interlace-mode\=\(string\)progressive";
 0:00:02.054259265 3471031 0x70dc18001140 DEBUG               basesink gstbasesink.c:3661:gst_base_sink_event:<filesink> received event 0x70dbfc003ae0 stream-start event: 0x70dbfc003ae0, time 99:99:99.999999999, seq-num 178, GstEventStreamStart, stream-id=(string)agg-83f073d0, flags=(GstStreamFlags)GST_STREAM_FLAG_NONE;
 0:00:02.054266841 3471031 0x70dc18001140 DEBUG               basesink gstbasesink.c:3393:gst_base_sink_default_event:<filesink> Now posting STREAM_START (seqnum:178)
 
-// XXX: accept caps format Y444_10LE on encoder::sink ?
+XXX: accept caps format Y444_10LE on encoder::sink ?
 
 0:00:02.054263569 3471031 0x70dc18000f50 DEBUG               GST_CAPS gstutils.c:3196:gst_pad_query_accept_caps:<encoder:sink> accept caps of video/x-raw, format=(string)Y444_10LE, width=(int)1024, height=(int)768, framerate=(fraction)30/1, multiview-mode=(string)mono, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive
 0:00:02.054270701 3471031 0x70dc18001140 DEBUG              structure gststructure.c:3023:gst_structure_id_get_valist: Expected field 'group-id' in structure: GstEventStreamStart, stream-id=(string)agg-83f073d0, flags=(GstStreamFlags)GST_STREAM_FLAG_NONE;
@@ -10341,7 +10347,7 @@
 0:00:02.054342707 3471031 0x70dc18000f50 DEBUG           videoencoder gstvideoencoder.c:1303:gst_video_encoder_sink_event:<encoder> received event 12814, caps
 0:00:02.054338124 3471031 0x70dc18001140 DEBUG              GST_EVENT gstevent.c:337:gst_event_new_custom: creating new event 0x70dbfc0029f0 caps 12814
 
-// XXX: encoder_setcaps Y444_10LE
+XXX: encoder_setcaps Y444_10LE
 
 0:00:02.054345487 3471031 0x70dc18000f50 DEBUG           videoencoder gstvideoencoder.c:730:gst_video_encoder_setcaps:<encoder> setcaps video/x-raw, format=(string)Y444_10LE, width=(int)1024, height=(int)768, framerate=(fraction)30/1, multiview-mode=(string)mono, pixel-aspect-ratio=(fraction)1/1, interlace-mode=(string)progressive
 0:00:02.054346208 3471031 0x70dc18001140 DEBUG               GST_PADS gstpad.c:5424:store_sticky_event:<muxer:src> notify caps
@@ -10885,7 +10891,7 @@
 0:00:02.055918212 3471031     0x3ac6e170 DEBUG                GST_BUS gstbus.c:831:gst_bus_source_dispatch:<bus1> source 0x3ae88120 calling dispatch with state-changed message: 0x70dc000015e0, time 99:99:99.999999999, seq-num 190, element 'DynamicPipeline', GstMessageStateChanged, old-state=(GstState)paused, new-state=(GstState)playing, pending-state=(GstState)void-pending;
 0:00:02.055937801 3471031     0x3ac6e170 DEBUG                GST_BUS gstbus.c:837:gst_bus_source_dispatch:<bus1> source 0x3ae88120 handler returns 1
 
-// XXX: x264enc switches to 4:4:4 profile? Why?
+XXX: x264enc switches to 4:4:4 profile? Why?
 
 0:00:02.056802265 3471031 0x70dc18000f50 INFO                 x264enc gstx264enc.c:1289:gst_x264_enc_log_callback:<encoder> profile High 4:4:4 Predictive, level 3.1, 4:4:4, 10-bit
 
@@ -10926,7 +10932,7 @@
 0:00:02.056943220 3471031 0x70dc18000f50 DEBUG               GST_CAPS gstpad.c:2871:gst_pad_get_allowed_caps:<encoder:src> allowed caps video/x-h264, framerate=(fraction)[ 0/1, 2147483647/1 ], width=(int)[ 16, 2147483647 ], height=(int)[ 16, 2147483647 ], profile=(string){ high-4:4:4, high-4:2:2, high-10, high, main, baseline, constrained-baseline, high-4:4:4-intra, high-4:2:2-intra, high-10-intra }, stream-format=(string)avc, alignment=(string)au; video/x-h264, framerate=(fraction)[ 0/1, 2147483647/1 ], width=(int)[ 16, 2147483647 ], height=(int)[ 16, 2147483647 ], profile=(string){ high-4:4:4, high-4:2:2, high-10, high, main, baseline, constrained-baseline, high-4:4:4-intra, high-4:2:2-intra, high-10-intra }, stream-format=(string){ avc, byte-stream }, alignment=(string)au
 0:00:02.056948238 3471031 0x70dc18000f50 DEBUG                default gstvideoutils.c:166:_gst_video_codec_state_free: free state 0x70dc080232c0
 
-// XXX: x264enc sets output caps to high-4:4:4
+XXX: x264enc sets output caps to high-4:4:4
 
 0:00:02.056953880 3471031 0x70dc18000f50 DEBUG                x264enc gstx264enc.c:2263:gst_x264_enc_set_src_caps:<encoder> output caps: video/x-h264, codec_data=(buffer)01f4001fffe1001e67f4001f90d9640100186c05a808080a000003000200000300791e30649001000668ebcc448440, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high-4:4:4
 
@@ -11118,7 +11124,7 @@
 0:00:02.083396891 3471031 0x70dc18000f50 DEBUG               GST_PADS gstpad.c:4232:gst_pad_query:<muxer:video_0> sent query 0x70dc0808f130 (accept-caps), result 1
 0:00:02.083400063 3471031 0x70dc18000f50 DEBUG               GST_CAPS gstutils.c:3202:gst_pad_query_accept_caps:<muxer:video_0> query returned 1
 
-// XXX: muxer refuses caps renego to profile "high-4:4:4" (chroma-format 4:4:4) from profile "high" (chroma-format 4:2:0)
+XXX: muxer refuses caps renego to profile "high-4:4:4" (chroma-format 4:4:4) from profile "high" (chroma-format 4:2:0)
 
 0:00:02.083429711 3471031 0x70dc18000f50 WARN                   qtmux gstqtmux.c:5812:gst_qt_mux_can_renegotiate:<muxer> pad video_0 refused renegotiation to video/x-h264, codec_data=(buffer)01f4001fffe1001e67f4001f90d9640100186c05a808080a000003000200000300791e30649001000668ebcc448440, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high-4:4:4, width=(int)1024, height=(int)768, pixel-aspect-ratio=(fraction)1/1, framerate=(fraction)30/1, interlace-mode=(string)progressive, colorimetry=(string)bt709, chroma-site=(string)mpeg2, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, coded-picture-structure=(string)frame, chroma-format=(string)4:4:4, bit-depth-luma=(uint)10, bit-depth-chroma=(uint)10, parsed=(boolean)true from video/x-h264, codec_data=(buffer)0164001fffe1001d6764001facb200800c3602d40404050000030001000003003c8f18324801000568ebccb22c, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, width=(int)1024, height=(int)768, pixel-aspect-ratio=(fraction)1/1, framerate=(fraction)30/1, interlace-mode=(string)progressive, colorimetry=(string)bt709, chroma-site=(string)mpeg2, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, coded-picture-structure=(string)frame, chroma-format=(string)4:2:0, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, parsed=(boolean)true
 0:00:02.083445194 3471031 0x70dc18000f50 DEBUG               GST_PADS gstpad.c:5986:gst_pad_send_event_unchecked:<muxer:video_0> sent event, ret not-negotiated
@@ -11160,7 +11166,7 @@
 0:00:02.083701115 3471031 0x70dc18000f50 DEBUG               GST_PADS gstpad.c:4232:gst_pad_query:<muxer:video_0> sent query 0x70dc08348a50 (accept-caps), result 1
 0:00:02.083703876 3471031 0x70dc18000f50 DEBUG               GST_CAPS gstutils.c:3202:gst_pad_query_accept_caps:<muxer:video_0> query returned 1
 
-// XXX: muxer refuses caps renego to profile "high-4:4:4" (chroma-format 4:4:4) from profile "high" (chroma-format 4:2:0)
+XXX: muxer refuses caps renego to profile "high-4:4:4" (chroma-format 4:4:4) from profile "high" (chroma-format 4:2:0)
 
 0:00:02.083726535 3471031 0x70dc18000f50 WARN                   qtmux gstqtmux.c:5812:gst_qt_mux_can_renegotiate:<muxer> pad video_0 refused renegotiation to video/x-h264, codec_data=(buffer)01f4001fffe1001e67f4001f90d9640100186c05a808080a000003000200000300791e30649001000668ebcc448440, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high-4:4:4, width=(int)1024, height=(int)768, pixel-aspect-ratio=(fraction)1/1, framerate=(fraction)30/1, interlace-mode=(string)progressive, colorimetry=(string)bt709, chroma-site=(string)mpeg2, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, coded-picture-structure=(string)frame, chroma-format=(string)4:4:4, bit-depth-luma=(uint)10, bit-depth-chroma=(uint)10, parsed=(boolean)true from video/x-h264, codec_data=(buffer)0164001fffe1001d6764001facb200800c3602d40404050000030001000003003c8f18324801000568ebccb22c, stream-format=(string)avc, alignment=(string)au, level=(string)3.1, profile=(string)high, width=(int)1024, height=(int)768, pixel-aspect-ratio=(fraction)1/1, framerate=(fraction)30/1, interlace-mode=(string)progressive, colorimetry=(string)bt709, chroma-site=(string)mpeg2, multiview-mode=(string)mono, multiview-flags=(GstVideoMultiviewFlagsSet)0:ffffffff:/right-view-first/left-flipped/left-flopped/right-flipped/right-flopped/half-aspect/mixed-mono, coded-picture-structure=(string)frame, chroma-format=(string)4:2:0, bit-depth-luma=(uint)8, bit-depth-chroma=(uint)8, parsed=(boolean)true
 0:00:02.083737815 3471031 0x70dc18000f50 DEBUG               GST_PADS gstpad.c:5986:gst_pad_send_event_unchecked:<muxer:video_0> sent event, ret not-negotiated
