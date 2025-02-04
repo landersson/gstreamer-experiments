@@ -18,7 +18,8 @@ logger = logging.getLogger(__name__)
 
 
 def save_dot_file(pipeline, name):
-    Gst.debug_bin_to_dot_file(pipeline, Gst.DebugGraphDetails.ALL, name)
+    pass
+    # Gst.debug_bin_to_dot_file(pipeline, Gst.DebugGraphDetails.ALL, name)
 
 
 def print_structure(structure):
@@ -45,11 +46,11 @@ class Branch:
     def add_to_pipeline(self, dynamic_pipeline):
         self.dynpipe = dynamic_pipeline
         self.add_and_link_elements()
-        for element in self.elements:
-            element.set_state(Gst.State.PLAYING)
+        # for element in self.elements:
+            # element.set_state(Gst.State.PLAYING)
         self.tee_pad = self.dynpipe.add_branch_to_tee(self)
-        # self.sync_elements()
-        # save_dot_file(self.pipeline.pipeline, "recording_branch_added")
+        self.sync_elements()
+        save_dot_file(self.dynpipe.pipeline, "branch_added_%s" % self.name)
 
     def add_and_link_elements(self):
         """Add elements to pipeline and link them up"""
@@ -100,17 +101,18 @@ class RecordingBranch(Branch):
         logger.info("New recording branch writing to %s", filename)
 
         # Create recording elements
-        recording_queue = Gst.ElementFactory.make("queue", "recording_queue")
-        encoder = Gst.ElementFactory.make("x264enc", "encoder")
-        parser = Gst.ElementFactory.make("h264parse", "parser")
-        muxer = Gst.ElementFactory.make("mp4mux", "muxer")
-        filesink = Gst.ElementFactory.make("filesink", "filesink")
+        recording_queue = Gst.ElementFactory.make("queue", "rb_queue")
+        converter = Gst.ElementFactory.make("videoconvert", "rb_converter")
+        encoder = Gst.ElementFactory.make("x264enc", "rb_encoder")
+        parser = Gst.ElementFactory.make("h264parse", "rb_parser")
+        muxer = Gst.ElementFactory.make("mp4mux", "rb_muxer")
+        filesink = Gst.ElementFactory.make("filesink", "rb_filesink")
 
         # Configure elements
         encoder.set_property("tune", "zerolatency")
         filesink.set_property("location", filename)
 
-        self.elements = [recording_queue, encoder, parser, muxer, filesink]
+        self.elements = [recording_queue, converter, encoder, parser, muxer, filesink]
 
     def sink(self):
         return self.elements[-1]
@@ -166,10 +168,11 @@ class DisplayBranch(Branch):
         display_queue = Gst.ElementFactory.make("queue", "display_queue")
         # NOTE: autovideosink seems to hang indefinitely when being removed from pipeline
         # display_sink = Gst.ElementFactory.make("autovideosink", "display")
-        converter = Gst.ElementFactory.make("videoconvert", "converter")
-        display_sink = Gst.ElementFactory.make("xvimagesink", "display")
+        converter = Gst.ElementFactory.make("videoconvert", "db_converter")
+        display_sink = Gst.ElementFactory.make("xvimagesink", "db_display")
 
         self.elements = [display_queue, converter, display_sink]
+        # self.elements = [display_queue, display_sink]
 
 
 class DynamicPipeline:
@@ -348,7 +351,11 @@ def make_test_source(width=1024, height=768):
 
     src.set_property("is-live", True)
 
-    caps = Gst.Caps.from_string(f"video/x-raw,width={width},height={height}")
+    # caps = Gst.Caps.from_string(f"video/x-raw,width={width},height={height},profile=high-4:2:2")
+    # caps = Gst.Caps.from_string(f"video/x-raw,width={width},height={height},format=YV12")
+    # caps = Gst.Caps.from_string(f"video/x-raw,width={width},height={height},format=RGB")
+    caps = Gst.Caps.from_string(f"video/x-raw,width={width},height={height},format=Y444")
+    # caps = Gst.Caps.from_string(f"video/x-raw,width={width},height={height}")
     capsfilter.set_property("caps", caps)
 
     return src, capsfilter, timeoverlay
@@ -414,8 +421,9 @@ def scenario_2(loop, pipeline):
     GLib.timeout_add(1000, add_display_branch)
     # GLib.timeout_add(2000, add_display_branch)
     GLib.timeout_add(2000, start_recording, "output1.mp4")
-    # GLib.timeout_add(1200, lambda: save_dot_file(pipeline.pipeline, "disp_added"))
-    # GLib.timeout_add(1800, lambda: save_dot_file(pipeline.pipeline, "disp_removed"))
+    GLib.timeout_add(1200, lambda: save_dot_file(pipeline.pipeline, "disp_added"))
+    GLib.timeout_add(1800, lambda: save_dot_file(pipeline.pipeline, "disp_removed"))
+    GLib.timeout_add(2200, lambda: save_dot_file(pipeline.pipeline, "recording"))
     GLib.timeout_add(5000, loop.quit)
 
 
